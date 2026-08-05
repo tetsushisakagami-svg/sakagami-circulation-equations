@@ -290,3 +290,20 @@ if __name__ == "__main__":
 ## 貢献
 
 貢献を歓迎します。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) をご覧ください。
+
+
+## Python-C Bridge Protocol Example
+
+公開向けの Python-C ブリッジプロトコル例として、`/home/runner/work/sakagami-circulation-equations/sakagami-circulation-equations/oseirunessa_v5_eternal_registry_final.py` を追加しています。
+
+このサンプルは以下を示します。
+
+- 固定化された request / response 構造
+- Python 側での最小限のレスポンス検証
+- レジストリ情報と同意台帳の表示デモ
+
+実行方法:
+
+```bash
+python oseirunessa_v5_eternal_registry_final.py
+```
