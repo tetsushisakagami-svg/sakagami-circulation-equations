@@ -5,7 +5,15 @@
 
 ---
 
-## 📋 バージョン一覧
+## 📋 プロジェクト一覧
+
+### 🚀 アクティブプロジェクト
+
+このリポジトリには、複数の自律最適化システムが共存しています。
+
+---
+
+## 📦 Project 1: スマート物流・倉庫荷役基盤
 
 ### 🎯 v1.0 (Stable - Basic Edition)
 **ブランチ:** `smart-warehouse-core`
@@ -54,16 +62,6 @@
 ✨ オンライン学習・リアルタイム最適化  
 ✨ 材質別の独立ポリシー進化  
 
-**主要な改善：**
-
-| 項目 | v1.0 | v2.0 |
-|------|------|------|
-| クリアランス設定 | 固定値 | 動的（振動に応じて進化） |
-| フィードバック | なし | 自動記録・学習 |
-| 学習メカニズム | なし | 強化学習型 |
-| 効率化対応 | なし | 低振動時に自動縮小 |
-| パラメータ調整 | 手動のみ | オンライン自動調整 |
-
 **学習プロセス例：**
 ```
 1回目搬送：高振動 1.8G → クリアランス 5.0cm → 5.5cm に自動拡大
@@ -87,118 +85,184 @@
 
 ---
 
-## 🔄 マイグレーションガイド
+## 🌍 Project 2: 環境保全&資源循環スマート基盤
 
-### v1.0 から v2.0 への移行
+### ♻️ v1.0 (Current - Basic Edition)
+**ブランチ:** `eco-circulation-core`
 
-**互換性：** ✅ ほぼ完全互換
+**説明：**
+気候変動リスクと資源消費データをリアルタイム解析し、地域コミュニティのエネルギー分散最適化と資源再循環を自律制御するシステム基盤
 
-v2.0 は v1.0 の全 API を保持しているため、既存コードの大部分はそのまま動作します。
+**主要機能：**
+✅ リアルタイム環境モニタリング（CO₂、湿度、気温、日射量）  
+✅ 環境健全性診断（0-100スコア）  
+✅ マイクログリッド最適化（再エネ発電・需給管理）  
+✅ 余剰エネルギー活用（蓄電・水素生成・リサイクル分配）  
+✅ 資源循環マネジメント（水・有機廃棄物・希少金属・梱包材）  
 
-**最小変更例：**
+**対応課題：**
+🌱 気候変動への適応  
+⚡ 再生可能エネルギーの最適配分  
+♻️ 資源循環と自動保全  
+🏘️ 地域レジリエンス向上  
 
-```python
-# v1.0
-navigator = SmartForkliftNavigator()
-navigator.execute_gentle_transfer(cargo, source, destination)
+**推奨用途：**
+- スマートコミュニティの構築
+- 地域のエネルギー自立化
+- 環境配慮型物流センターの管理
+- 循環型経済への移行基盤
 
-# v2.0（振動データを追加するだけ）
-navigator = SmartForkliftNavigator()
-navigator.execute_gentle_transfer(
-    cargo, source, destination,
-    measured_vibration=1.2  # ← 新パラメータ（オプション）
-)
-```
+**ドキュメント：**
+📄 [README_ECO_CIRCULATION.md](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/eco-circulation-core/README_ECO_CIRCULATION.md)
 
-**段階的移行ステップ：**
+**コード：**
+📝 [eco_circulation_core.py](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/eco-circulation-core/eco_circulation_core.py)
 
-1. ✅ v1.0 で基本構造を構築
-2. ✅ センサー装備フォークリフトを導入
-3. ✅ v2.0 に切り替え、学習を開始
-4. ✅ フィードバックデータを蓄積
-5. ✅ 最適ポリシーに収束
-
----
-
-## 🎓 使い分けガイド
-
-### v1.0 を選ぶべき場合
-
-- 📌 初期段階の物流システム構築
-- 📌 センサー導入予定がない
-- 📌 シンプルな安全基準管理のみ必要
-- 📌 学習機能が不要（固定運用）
-
-### v2.0 を選ぶべき場合
-
-- 🚀 IoT・センサー環境が整備されている
-- 🚀 自動化・最適化に投資できる
-- 🚀 データドリブンな運用を目指す
-- 🚀 機械学習の実装例を参考にしたい
+**リリース日：** 2026-08-08
 
 ---
 
-## 📊 機能比較表
+## ⚙️ Project 3: Tettyan's Right-Hand Law Verification Engine
 
-| 機能 | v1.0 | v2.0 | 備考 |
-|------|------|------|------|
-| **3D重心計算** | ✅ | ✅ | 同一実装 |
-| **バランス判定** | ✅ | ✅ | 同一基準 |
-| **才数計算** | ✅ | ✅ | 同一 |
-| **材質分類** | ✅ | ✅ | 同一 |
-| **非破壊荷役** | ✅ | ✅ | v2.0 は学習機能付き |
-| **振動センサー** | ❌ | ✅ | v2.0 新規 |
-| **フィードバック蓄積** | ❌ | ✅ | v2.0 新規 |
-| **自律学習** | ❌ | ✅ | v2.0 新規 |
-| **オンライン最適化** | ❌ | ✅ | v2.0 新規 |
+### ⚙️ v1.0 (Current - Physics Validation Edition)
+**ブランチ:** `tettyan-right-hand-law`
+
+**説明：**
+Light Potential Vector (L) と Gravity/Inertia Acceleration Vector (G) の外積（Cross Product）により、時間進行・位相ベクトル（Time Direction Vector）を導出・検証する物理モデル。
+
+**主要機能：**
+✅ 外積計算（T = L × G）  
+✅ 直交性検証（内積 = 0）  
+✅ ベクトル大きさ（ノルム）計算  
+✅ 軸間角度計算  
+✅ 物理検証レポート出力  
+
+**対応領域：**
+⚙️ 物理ベクトル解析  
+⚙️ 位相空間幾何学  
+⚙️ 時間方向性検証  
+⚙️ 学術研究・物理シミュレーション  
+
+**推奨用途：**
+- 高次元物理モデルの検証
+- ベクトル外積の教育・研究
+- 物理シミュレーション基盤
+- 学術論文・技術検証
+
+**ドキュメント：**
+📄 [README_TETTYAN_RIGHT_HAND_LAW.md](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/tettyan-right-hand-law/README_TETTYAN_RIGHT_HAND_LAW.md)
+
+**コード：**
+📝 [tettyan_right_hand_law.py](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/tettyan-right-hand-law/tettyan_right_hand_law.py)
+
+**リリース日：** 2026-08-09
 
 ---
 
 ## 🔗 クイックリンク
 
-### ドキュメント
-- [v1.0 README](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core/README_SMARTWAREHOUSE.md)
-- [v2.0 README](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core-v2-adaptive/README_SMARTWAREHOUSE_V2.md)
+### Smart Warehouse（物流・倉庫荷役）
+| | v1.0 | v2.0 Adaptive |
+|---|------|---|
+| ブランチ | smart-warehouse-core | smart-warehouse-core-v2-adaptive |
+| README | [docs](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core/README_SMARTWAREHOUSE.md) | [docs](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core-v2-adaptive/README_SMARTWAREHOUSE_V2.md) |
+| コード | [python](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core/smart_warehouse_core.py) | [python](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core-v2-adaptive/smart_warehouse_core_v2_adaptive.py) |
 
-### ソースコード
-- [v1.0 コード](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core/smart_warehouse_core.py)
-- [v2.0 コード](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/smart-warehouse-core-v2-adaptive/smart_warehouse_core_v2_adaptive.py)
+### Eco-Circulation（環境保全・資源循環）
+| | v1.0 |
+|---|------|
+| ブランチ | eco-circulation-core |
+| README | [docs](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/eco-circulation-core/README_ECO_CIRCULATION.md) |
+| コード | [python](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/eco-circulation-core/eco_circulation_core.py) |
 
-### ブランチ
-- [smart-warehouse-core](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/tree/smart-warehouse-core)
-- [smart-warehouse-core-v2-adaptive](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/tree/smart-warehouse-core-v2-adaptive)
+### Tettyan's Right-Hand Law（物理検証）
+| | v1.0 |
+|---|------|
+| ブランチ | tettyan-right-hand-law |
+| README | [docs](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/tettyan-right-hand-law/README_TETTYAN_RIGHT_HAND_LAW.md) |
+| コード | [python](https://github.com/tetsushisakagami-svg/sakagami-circulation-equations/blob/tettyan-right-hand-law/tettyan_right_hand_law.py) |
+
+---
+
+## 📊 全プロジェクト比較表
+
+| 機能 | Smart WH v1.0 | Smart WH v2.0 | Eco v1.0 | Tettyan v1.0 |
+|------|---|---|---|---|
+| **3D重心計算** | ✅ | ✅ | ❌ | ❌ |
+| **振動センサー** | ❌ | ✅ | ❌ | ❌ |
+| **自動学習** | ❌ | ✅ | ❌ | ❌ |
+| **環境モニタリング** | ❌ | ❌ | ✅ | ❌ |
+| **マイクログリッド最適化** | ❌ | ❌ | ✅ | ❌ |
+| **物理ベクトル検証** | ❌ | ❌ | ❌ | ✅ |
+| **リアルタイム制御** | ❌ | ✅ | ✅ | ❌ |
+
+---
+
+## 🎯 使い分けガイド
+
+### Smart Warehouse を選ぶべき場合
+- 📌 物流センター・倉庫の管理システム構築
+- 📌 フォークリフト・荷役の安全性向上
+- 📌 非破壊搬送の最適化
+- 📌 より高度な機械学習にはv2.0を選択
+
+### Eco-Circulation を選ぶべき場合
+- 🌍 地域の環境・エネルギー管理
+- 🌍 スマートコミュニティの構築
+- 🌍 循環型経済への移行支援
+- 🌍 気候変動への適応対応
+
+### Tettyan's Right-Hand Law を選ぶべき場合
+- ⚙️ 物理ベクトル解析・検証
+- ⚙️ 高次元位相空間の研究
+- ⚙️ 時間方向性の物理的検証
+- ⚙️ 学術論文・シミュレーション
+
+### 複合利用の場合
+- 🏭 環境配慮型物流センターの総合管理
+- 🏭 荷役システムと再エネグリッドの連携
+- 🏭 サステナブル物流エコシステムの構築
+- 🔬 物理検証を伴う高度な最適化
 
 ---
 
 ## 📅 開発ロードマップ
 
 ### ✅ 完了
-- v1.0 基本版リリース
-- v2.0 Adaptive Edition リリース
+- Smart Warehouse v1.0 リリース
+- Smart Warehouse v2.0 Adaptive Edition リリース
+- Eco-Circulation v1.0 リリース
+- Tettyan's Right-Hand Law v1.0 リリース
 
 ### 🔄 計画中
-- **v2.1 (近期)** - クラウド連携機能
-- **v3.0 (中期)** - 深層学習（ニューラルネット）統合
-- **v3.5 (中期)** - モバイルアプリケーション
-- **v4.0 (長期)** - 完全自動化フレームワーク
+- **Smart WH v2.1** - クラウド連携機能
+- **Eco v1.1** - AI需要予測機能
+- **Tettyan v1.1** - 多次元拡張・行列演算
+- **統合版 v3.0** - 全システムの連携
+- **Eco v2.0** - ブロックチェーン資源取引
+- **完全自動化フレームワーク v4.0**
 
 ---
 
 ## 💬 ご質問・ご提案
 
-各バージョンについてご質問やご提案がありましたら、GitHub Issues でお気軽にお寄せください。
+各プロジェクト・バージョンについてご質問やご提案がありましたら、GitHub Issues でお気軽にお寄せください。
 
-**それぞれのブランチ内で Issue を作成することをお勧めします：**
-- v1.0 関連 → `smart-warehouse-core` ブランチ内で Issue 作成
-- v2.0 関連 → `smart-warehouse-core-v2-adaptive` ブランチ内で Issue 作成
+**ブランチ内で Issue を作成することをお勧めします：**
+- Smart WH v1.0 関連 → `smart-warehouse-core` ブランチ内で Issue
+- Smart WH v2.0 関連 → `smart-warehouse-core-v2-adaptive` ブランチ内で Issue
+- Eco v1.0 関連 → `eco-circulation-core` ブランチ内で Issue
+- Tettyan v1.0 関連 → `tettyan-right-hand-law` ブランチ内で Issue
 
 ---
 
 ## 📄 ライセンス
 
-両バージョンとも **MIT ライセンス** の下で公開されています。
+すべてのプロジェクト・バージョンは **MIT ライセンス** の下で公開されています。
 
 ---
 
-**最終更新日：** 2026-08-08  
+**最終更新日：** 2026-08-09  
 **作者：** 阪上哲史 (Tetsushi Sakagami)
+
+🌟 すべてのプロジェクトの成功をお祈りしています！💓😊
