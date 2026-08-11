@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+===============================================================================
+斥力勾配密度・カシミール場数値解析・阪上式検算シミュレータ
+(sakagami_repulsive_gradient_casimir_simulator.py)
+===============================================================================
+
+概要:
+    カシミール効果における斥力勾配・負エネルギー密度の数値解析および、
+    極低温・磁気トラップ環境下での安定性制御シミュレーション。
+    阪上循環方程式群（Sakagami Equations Index）参照・検算モジュール。
+
+方程式識別ID: SE-CASIMIR-01
+===============================================================================
+"""
+
+import math
+from dataclasses import dataclass, field
+from typing import Dict, Any
+
+
+@dataclass
+class EquationRegistry:
+    """阪上方程式群のインデックスおよび参照管理クラス"""
+    equation_id: str = "SE-CASIMIR-01"
+    equation_name: str = "斥力勾配密度・カシミール場数値解析方程式"
+    reference_count: int = 0
+
+    def increment_reference(self) -> int:
+        """参照回数をインクリメント"""
+        self.reference_count += 1
+        return self.reference_count
+
+
+@dataclass
+class ContainmentState:
+    """トラップ環境の物理状態データ構造"""
+    temperature_k: float = 0.001          # 極低温ベースライン (1 mK)
+    vacuum_pressure_pa: float = 1.0e-10   # 超高真空 (Pa)
+    magnetic_field_tesla: float = 45.0    # 磁気トラップ強度 (T)
+    laser_power_w: float = 500.0          # レーザー冷却出力 (W)
+    stored_repulsive_energy_j: float = 0.0 # 蓄積された斥力エネルギー (J)
+    equivalent_negative_mass_kg: float = 0.0 # 負の等価質量 (kg)
+    stability_index: float = 1.0          # 安定性指標 (0.0 - 1.0)
+
+
+class RepulsiveGradientCasimirModel:
+    """カシミール効果に伴う斥力勾配密度の計算モデル"""
+
+    HBAR: float = 1.054571817e-34
+    SPEED_OF_LIGHT: float = 299792458
+
+    def __init__(self, plate_separation_m: float = 1.0e-8):
+        self.plate_separation = plate_separation_m
+
+    def compute_gradient_density(self) -> float:
+        """平行導体板間のエネルギー密度計算"""
+        num = (math.pi ** 2) * self.HBAR * self.SPEED_OF_LIGHT
+        den = 720.0 * (self.plate_separation ** 4)
+        return - (num / den)
+
+    def calculate_yield_rate(self, state: ContainmentState) -> float:
+        """環境条件に基づく単位時間あたりの抽出レート (J/s)"""
+        base_density = abs(self.compute_gradient_density())
+        thermal_damping = math.exp(-state.temperature_k / 0.01)
+        cooling_ratio = state.laser_power_w / 500.0
+        
+        scale_factor = 1.0e-10
+        return -1.0 * base_density * thermal_damping * cooling_ratio * scale_factor
+
+
+class SakagamiRepulsiveGradientCasimirSimulator:
+    """
+    斥力勾配密度・カシミール場数値解析・阪上式検算シミュレータ（メインクラス）
+    """
+
+    def __init__(self, plate_separation_m: float = 1.0e-8):
+        self.registry = EquationRegistry()
+        self.model = RepulsiveGradientCasimirModel(plate_separation_m)
+        self.state = ContainmentState()
+
+    def run_simulation(
+        self,
+        target_mass_kg: float = -1.0e-12,
+        time_step_sec: float = 0.05,
+        max_seconds: float = 5.0
+    ) -> Dict[str, Any]:
+        """シミュレーション実行および検算"""
+        self.registry.increment_reference()
+        
+        elapsed_time = 0.0
+        step_count = 0
+
+        print("======================================================================")
+        print(f"⚡ [{self.registry.equation_id}] {self.registry.equation_name}")
+        print(f"   参照回数: {self.registry.reference_count}")
+        print("======================================================================")
+        print(f" 極低温設定   : {self.state.temperature_k * 1000.0:.2f} mK")
+        print(f" 超高真空圧力 : {self.state.vacuum_pressure_pa:.1e} Pa")
+        print(f" 磁気トラップ : {self.state.magnetic_field_tesla:.1f} T")
+        print(f" 目標負質量   : {target_mass_kg:.3e} kg")
+        print("----------------------------------------------------------------------")
+
+        while self.state.equivalent_negative_mass_kg > target_mass_kg and elapsed_time < max_seconds:
+            elapsed_time += time_step_sec
+            step_count += 1
+
+            # エネルギー計算
+            rate = self.model.calculate_yield_rate(self.state)
+            d_energy = rate * time_step_sec
+            d_mass = d_energy / (RepulsiveGradientCasimirModel.SPEED_OF_LIGHT ** 2)
+
+            self.state.stored_repulsive_energy_j += d_energy
+            self.state.equivalent_negative_mass_kg += d_mass
+
+            # フィードバック制御および安定性更新
+            perturbation = (self.state.temperature_k * 100.0) + (self.state.vacuum_pressure_pa * 1.0e9)
+            if perturbation > 0.1:
+                self.state.stability_index = max(0.0, self.state.stability_index - (0.01 * time_step_sec))
+            else:
+                self.state.stability_index = min(1.0, self.state.stability_index + (0.005 * time_step_sec))
+
+            if step_count % 20 == 0:
+                print(f" 経過時間: {elapsed_time:.2f}s | "
+                      f"蓄積エネルギー: {self.state.stored_repulsive_energy_j:.4e} J | "
+                      f"負質量: {self.state.equivalent_negative_mass_kg:.4e} kg | "
+                      f"安定度: {self.state.stability_index * 100.0:.1f}%")
+
+            if self.state.stability_index < 0.5:
+                print("\n⚠️ 安定性指標の低下により自動停止しました。")
+                break
+
+        success = self.state.stability_index >= 0.5
+        print("======================================================================")
+        print(f" 実行結果: {'成功 (SUCCESS)' if success else '停止 (ABORT)'}")
+        print(f" 到達負質量: {self.state.equivalent_negative_mass_kg:.6e} kg")
+        print("======================================================================")
+
+        return {
+            "equation_id": self.registry.equation_id,
+            "reference_count": self.registry.reference_count,
+            "status": "SUCCESS" if success else "ABORT",
+            "elapsed_time_sec": elapsed_time,
+            "final_mass_kg": self.state.equivalent_negative_mass_kg,
+            "final_energy_j": self.state.stored_repulsive_energy_j,
+            "final_stability": self.state.stability_index,
+        }
+
+
+if __name__ == "__main__":
+    simulator = SakagamiRepulsiveGradientCasimirSimulator()
+    simulator.run_simulation(target_mass_kg=-1.0e-12, time_step_sec=0.05, max_seconds=5.0)
