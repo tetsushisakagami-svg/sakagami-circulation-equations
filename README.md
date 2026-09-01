@@ -184,7 +184,7 @@ python sakagami_equations.py
 
 - ❌ **OpenAI公式認証**: なし（提供されていません）
 - ❌ **独立第三者再現**: 未実施（公開レポート待ち）
-- ✅ **OpenAI Claude コードレビュー**: 設計・実装の支援提供
+- ✅ **対話型AIによるコードレビュー支援**: 設計・実装の支援提供
 - ✅ **公開検証可能**: すべてのコードと手順は公開ファイルから再現可能
 
 詳細は [KINDRITHIA-CHARTER-PRACTICAL-1.003](KINDRITHIA_CHARTER_PRACTICAL_1_003.txt) および [Canonical Guard v1.004](kindrithia_canonical_guard_v1_004.py) をご覧ください。
@@ -195,7 +195,7 @@ python sakagami_equations.py
 
 - **公開版**（このリポジトリ）: 最高度の学術透明性と再現性確保
 - **非公開版**: セキュリティ・統合管理・自律進化システム
-- **協業モデル**: OpenAI Claude による設計支援 + 公開検証
+- **協業モデル**: 対話型AIによるコードレビュー支援 + 公開検証
 
 ---
 
@@ -284,7 +284,7 @@ STATUS: MATHEMATICAL CORE CONSISTENT
 
 ## 謝辞
 
-- **OpenAI Claude**: コードレビュー支援・設計相談
+- **対話型AIによるコードレビュー支援**: 設計・実装相談
 - **L1地球圏の研究コミュニティ**: 継続的なサポート
 - **Valcuria AI System**: 統合管理・自律進化システム
 
