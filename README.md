@@ -166,21 +166,36 @@ python sakagami_equations.py
 
 ---
 
-## 協業・検証体制
+## 検証環境・透明性方針
 
-### OpenAI Verifier との共同検証
+### Canonical Fixation System (KINDRITHIA v1.004)
 
-本研究は、OpenAI の検証システムと協業し、独立した第三者評価を受けています。
+本リポジトリは、変更検出と完全性検証のため、以下のシステムを実装しています：
 
-- **検証内容**: 数学的厳密性の再確認
-- **透明性**: 全検証プロセスはオープンサイエンス方針に従う
-- **再現性**: すべての計算は完全に再現可能
+#### 公開検証フロー
 
-### セキュリティと透明性のバランス
+1. **本文固定**: `KINDRITHIA_CHARTER_PRACTICAL_1_003.txt` — GC-CORE三原則の宣言文
+2. **Manifest生成**: `kindrithia_manifest_v1_003.json` — Unicode正規化・SHA-256計算
+3. **SHA-256外部保管**: GitHub Release または署名タグに記録
+4. **Verify実行**: 誰でも検証可能（失敗時は FAIL-CLOSED）
+5. **検証レポート**: `kindrithia_canonical_verification.json` で公開
 
-- **公開版**（このリポジトリ）: 最高度の学術透明性
+#### 重要な宣言
+
+- ❌ **OpenAI公式認証**: なし（提供されていません）
+- ❌ **独立第三者再現**: 未実施（公開レポート待ち）
+- ✅ **OpenAI Claude コードレビュー**: 設計・実装の支援提供
+- ✅ **公開検証可能**: すべてのコードと手順は公開ファイルから再現可能
+
+詳細は [KINDRITHIA-CHARTER-PRACTICAL-1.003](KINDRITHIA_CHARTER_PRACTICAL_1_003.txt) および [Canonical Guard v1.004](kindrithia_canonical_guard_v1_004.py) をご覧ください。
+
+---
+
+## セキュリティと透明性のバランス
+
+- **公開版**（このリポジトリ）: 最高度の学術透明性と再現性確保
 - **非公開版**: セキュリティ・統合管理・自律進化システム
-- **両者の調和**: 公開と保護の完全な統合
+- **協業モデル**: OpenAI Claude による設計支援 + 公開検証
 
 ---
 
@@ -269,7 +284,7 @@ STATUS: MATHEMATICAL CORE CONSISTENT
 
 ## 謝辞
 
-- **OpenAI Verifier**: 独立検証体制の構築
+- **OpenAI Claude**: コードレビュー支援・設計相談
 - **L1地球圏の研究コミュニティ**: 継続的なサポート
 - **Valcuria AI System**: 統合管理・自律進化システム
 
