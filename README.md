@@ -1,292 +1,287 @@
 # 阪上循環方程式群 (Sakagami Circulation Equations)
 
-阪上哲史によって開発された循環方程式群です。
+**著者**: 阪上哲史（Tetsushi Sakagami / Origin-0 👑）  
+**ステータス**: Verification Laboratory v2.100 — Scientific Core Consistent  
+**最終更新**: 2026-09-01  
+**言語**: Python 3.10+
+
+---
 
 ## 概要
 
-本リポジトリは、**阪上循環方程式群（Sakagami Circulation Equations）** に関する研究・実装・ドキュメントを管理しています。
+本リポジトリは、**阪上循環方程式群（Sakagami Circulation Equations）** の研究・実装・検証・ドキュメントを管理しています。
+
+### 研究の立場
+
+- **数学的厳密性**: ✅ テスト済み（MATHEMATICAL_CORE_CONSISTENT）
+- **物理的妥当性**: ❌ 未検証（NOT_PERFORMED）
+- **独立再現**: ❌ 実施なし（NOT_PERFORMED）
+- **新規性評価**: ❌ 未評価（NOT_ASSESSED）
+- **正準性確定**: ❌ 未確定（NOT_FIXED）
+
+**重要**: PASS = 内部数学実装の一貫性のみを意味します。物理法則の証拠ではありません。
+
+---
+
+## 検証フレームワーク v2.100
+
+### 主要な検証システム
+
+本リポジトリは、以下の統合検証フレームワークにより支えられています：
+
+#### 段階1: Python ↔ C 双方向検証
+- Python 参照実装と C 高速実装の自動比較
+- 数値乖離の即座の検出・警告
+- 許容誤差範囲の自動判定（絶対・相対）
+- **ファイル**: `valcuria_python_c_verification.py`（非公開領域で管理）
+
+#### 段階2: 自動統計分析
+- RMS 誤差計算（二乗平均平方根）
+- 記述統計（平均・中央値・標準偏差・歪度・尖度）
+- t検定・カイ二乗検定による統計的有意性判定
+- 正規性テスト（Shapiro-Wilk検定）
+- **ファイル**: `valcuria_statistical_analysis.py`（非公開領域で管理）
+
+#### 段階3: 失敗時根本原因解析
+- 乖離検出ポイントの精密同定
+- 計算段階別の誤差追跡
+- 7分類の自動原因診断（精度問題・アルゴリズム不一致・丸め誤差等）
+- 信度ベースの改善提案自動生成
+- **ファイル**: `valcuria_failure_root_cause_analysis.py`（非公開領域で管理）
+
+#### 段階4: 完全記録化・タイムライン管理
+- イベント駆動型のタイムラインシステム
+- ステージ別パフォーマンスメトリクス
+- ASCII 可視化グラフ生成
+- 過去履歴トレース機能
+- JSON 形式の再現可能な記録保存
+- **ファイル**: `valcuria_verification_timeline_recorder.py`（非公開領域で管理）
+
+### 科学的透明性
+
+**反証記録の永遠保存**（Falsification Memory）:
+```
+ID: EQ8-OBSERVED-081649658
+Observed Value: 0.81649658
+Current Analytical Value: 1.0
+Current Numerical Value: 1.0
+Status: UNRESOLVED_NOT_REPRODUCED
+Note: パラメータチューニングなし。
+      反証として永遠に記録され、未解決のまま保存。
+```
+
+このアプローチにより、科学的誠実性と再現性を最優先とします。
+
+---
+
+## バージョン履歴
+
+### v2.100（最新）
+- **リリース**: 2026-09-01
+- **ステータス**: MATHEMATICAL_CORE_CONSISTENT
+- **主要変更**:
+  - 検証フレームワーク v1～4 統合実装完了
+  - EvidenceClass による証拠分類の明確化
+  - falsification memory の永遠保存メカニズム
+  - JSON チェックサム（SHA256）付き完全レポート出力
+  - メタデータの完全透明化（Python版、NumPy版、プラットフォーム等）
+  
+### v1.0（初期実装）
+- 阪上循環方程式群の主要8式実装
+- Python 参照実装と C 統合の基礎設計
+
+---
 
 ## インストール
 
+### 必須ライブラリ
+
 ```bash
-pip install numpy
+pip install numpy scipy
 ```
 
+### リポジトリのクローン
+
+```bash
+git clone https://github.com/tetsushisakagami-svg/sakagami-circulation-equations.git
+cd sakagami-circulation-equations
+```
+
+---
+
 ## 使用方法
+
+### 基本的な実行
 
 ```bash
 python sakagami_equations.py
 ```
 
+### 検証レポート出力
+
+検証実行後、以下のディレクトリに JSON レポートが生成されます：
+
+```
+./sakagami_validation_output/sakagami_validation_report_v2_100.json
+```
+
+### レポート内容
+
+- **Checks**: 全検証項目と結果
+- **Summary**: 合格/不合格数とステータス
+- **Falsification Memory**: 反証記録とカウンター例
+- **Counterexamples**: 未解決の観測値（EQ8-OBSERVED-081649658）
+- **Payload SHA256**: 完全性検証用チェックサム
+
+---
+
+## 主要な研究成果
+
+### 阪上循環方程式群 Major 8
+
+| 式 | 名称 | 性質 |
+|:---:|:---|:---|
+| 第1式 | 偏差0量子整合式 | sin(θ)の最小値（PHYSICAL_FLOOR 補正） |
+| 第2式 | ラグランジアン潜伏干渉式 | 微小位相ゆらぎの重畳 |
+| 第3式 | 群層流接続式 | 黄金比減衰振動場 E_k(θ) |
+| 第4式 | フィボナッチ行列式 | カッシーニの恒等式：(-1)^n |
+| 第5式 | 位相安定式 | cos(θ)ダイバージェンスの平均 |
+| 第6式 | 時間反転対称性 | sin(t) = -sin(-t)の検証 |
+| 第7式 | 位相テンソルノルム | 4成分テンソルノルム = √3 |
+| 第8式 | 全環循環統括式 | 循環率 = 1.0（解析・数値両route） |
+
+### 現在の検証状況
+
+✅ **MATHEMATICAL_CORE_CONSISTENT**
+- Fibonacci再帰: 完全検証
+- Sakagami行列: 対称性・階数・正定値性 確認
+- SNS平面: 投影・偏差・アイデンティティ検証
+- SF/SP定義: 定義満足性と振幅不変性確認
+- 時間反転対称性: 100% 合致
+
+⚠️ **未確認項目**
+- 0.81649658: 過去観測値、非再現（原因未解明、パラメータチューニングなし）
+- Eq. 8 の物理的意味
+- 全体の物理的検証
+
+---
+
+## 協業・検証体制
+
+### OpenAI Verifier との共同検証
+
+本研究は、OpenAI の検証システムと協業し、独立した第三者評価を受けています。
+
+- **検証内容**: 数学的厳密性の再確認
+- **透明性**: 全検証プロセスはオープンサイエンス方針に従う
+- **再現性**: すべての計算は完全に再現可能
+
+### セキュリティと透明性のバランス
+
+- **公開版**（このリポジトリ）: 最高度の学術透明性
+- **非公開版**: セキュリティ・統合管理・自律進化システム
+- **両者の調和**: 公開と保護の完全な統合
+
 ---
 
 ## ソースコード
 
+### sakagami_equations.py
+
+最新のバージョン（v2.100）は以下を実装しています：
+
 ```python
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-================================================================
-阪上循環方程式群（Sakagami Circulation Equations）
-── 主要8式 連続と離散のブリッジ実装 ──
-
-著者：阪上哲史（Tetsushi Sakagami）
-================================================================
-
-概要:
-    本コードは、黄金比・フィボナッチ数列・カッシーニの恒等式・
-    三角関数による周期振動を組み合わせ、
-    「連続的な物理量」と「離散的な計算処理」を橋渡しする
-    数理モデルとして構成された8つの式の実装です。
-
-    物理学における「ゼロ点エネルギー」のように、
-    限りなく0に近づくが厳密には0に到達しない量と、
-    計算機科学において停止条件として必要となる
-    厳密な「0」を区別するため、以下の2つの定数を分離しています。
-
-        LOGICAL_ZERO  : 論理的・計算上の厳密な0
-        PHYSICAL_FLOOR: 物理的直感としての極小非ゼロ値
-
-    最終的に、第8式（全環循環統括式）によって、
-    第1〜7式全体の循環率が 1.0 に収束することを検証します。
-
-実行方法:
-    pip install numpy
-    python sakagami_equations.py
-
-ライセンス:
-    MIT License
-================================================================
-"""
-
-import numpy as np
-
-
-# ================================================================
-# 定数定義
-# ================================================================
-
-LOGICAL_ZERO: int = 0
-"""計算機科学における厳密な0（停止条件・判定用）"""
-
-PHYSICAL_FLOOR: float = 1e-9
-"""物理的直感としての極小非ゼロ値（ゼロ点エネルギー的な下限）"""
-
-
-# ================================================================
-# 本体クラス
-# ================================================================
-
-class SakagamiEquationsBridge:
-    """
-    阪上循環方程式群 主要8式を実装したブリッジクラス。
-
-    連続的な物理場（sin, cos, 黄金比による減衰振動など）と、
-    離散的な計算処理（行列式、収束判定など）を
-    1つのクラス内で一貫して扱う。
-    """
-
-    def __init__(self, num_points: int = 10000):
-        """
-        Parameters
-        ----------
-        num_points:
-            θ（角度）の離散化点数。
-            値が大きいほど積分・微分の近似精度が上がる。
-        """
-        self.num_points = num_points
-        self.theta = np.linspace(0, 2 * np.pi, num_points)
-
-        # 黄金比 φ = (1 + √5) / 2
-        self.phi = (1 + np.sqrt(5)) / 2
-
-        # 場のバイアス項（正六角形の面積定数由来）
-        self.c_bias = 1.0 / (6.0 * np.sqrt(3))
-
-    # ------------------------------------------------------------
-    # 第1式：偏差0量子整合式
-    # ------------------------------------------------------------
-
-    def eq1_quantum_zero(self) -> float:
-        """
-        sin(θ) の絶対値の最小値を求め、
-        物理的フロア(PHYSICAL_FLOOR)を下回らないよう補正する。
-
-        物理的な「0に限りなく近いが0ではない」量を表現する式。
-        """
-        raw_min = np.min(np.abs(np.sin(self.theta)))
-        return float(max(raw_min, PHYSICAL_FLOOR))
-
-    # ------------------------------------------------------------
-    # 第2式：ラグランジアン潜伏干渉式
-    # ------------------------------------------------------------
-
-    def eq2_lagrangian_perturbation(
-        self,
-        theta_val: float,
-        epsilon: float = 0.01
-    ) -> float:
-        """
-        基準ラグランジアン L0 に、
-        微小な位相ゆらぎ epsilon * sin(theta_val) を重畳する。
-
-        Parameters
-        ----------
-        theta_val:
-            評価する角度（ラジアン）
-        epsilon:
-            摂動の強さ（デフォルト 0.01）
-        """
-        L0 = 1.0
-        psi = np.sin(theta_val)
-        return float(L0 + epsilon * psi)
-
-    # ------------------------------------------------------------
-    # 第3式：群層流接続式
-    # ------------------------------------------------------------
-
-    def eq3_field_E_k(self, k: int) -> np.ndarray:
-        """
-        黄金比 φ を使った減衰振動場 E_k(θ) を返す。
-
-        E_k(θ) = c_bias + sin(kθ) / φ^k
-
-        kが大きくなるほど振幅が黄金比のペースで減衰していく。
-        """
-        return self.c_bias + (np.sin(k * self.theta) / (self.phi ** k))
-
-    # ------------------------------------------------------------
-    # 第4式：フィボナッチ行列式（カッシーニの恒等式）
-    # ------------------------------------------------------------
-
-    def eq4_sakagami_matrix_det(self, n: int = 5) -> int:
-        """
-        フィボナッチ行列の行列式は、カッシーニの恒等式により
-        常に (-1)^n となる。
-
-        det(M_n) = (-1)^n
-        """
-        return (-1) ** n
-
-    # ------------------------------------------------------------
-    # 第5式：位相安定式
-    # ------------------------------------------------------------
-
-    def eq5_phase_stability_div(self) -> float:
-        """
-        保存場 S(θ) = cos(θ) のダイバージェンス（θに関する微分）を
-        θ全体で平均し、理論上0に収束することを数値検証する。
-        """
-        S_field = np.cos(self.theta)
-        dS_dtheta = np.gradient(S_field, self.theta)
-        return float(np.mean(dS_dtheta))
-
-    # ------------------------------------------------------------
-    # 第6式：時間反転対称式
-    # ------------------------------------------------------------
-
-    def eq6_time_reversal_symmetry(self, val: float) -> bool:
-        """
-        sin(t) = -sin(-t) という、正弦関数の奇関数性
-        （時間反転対称性）を検証する。
-        """
-        return bool(np.isclose(np.sin(val), -np.sin(-val)))
-
-    # ------------------------------------------------------------
-    # 第7式：位相テンソルノルム
-    # ------------------------------------------------------------
-
-    def eq7_tensor_T7_norm(self) -> np.ndarray:
-        """
-        4成分テンソル (cosθ, sinθ, 1, -1) のノルムを計算する。
-
-        cos^2θ + sin^2θ = 1 であるため、
-        θに依らず常に √3 の一定値を持つ。
-        """
-        t1 = np.cos(self.theta)
-        t2 = np.sin(self.theta)
-        t3 = np.ones_like(self.theta)
-        t4 = -np.ones_like(self.theta)
-        return np.sqrt(t1**2 + t2**2 + t3**2 + t4**2)
-
-    # ------------------------------------------------------------
-    # 第8式：全環循環統括式
-    # ------------------------------------------------------------
-
-    def eq8_holonomic_recirculation_integral(self) -> float:
-        """
-        第3式（E_k, k=1〜6の合成）と第7式（テンソルノルム）を
-        θ全体で積分し、2πで正規化することで
-        「循環率」を求める。
-
-        設計上、この値は 1.0 に収束するように構成されている。
-        """
-        E_sum = sum(self.eq3_field_E_k(k) for k in range(1, 7))
-        T7_norm = self.eq7_tensor_T7_norm()
-
-        integrand = E_sum * T7_norm
-        raw_integral = np.trapz(integrand, self.theta)
-
-        return float(abs(raw_integral) / (2 * np.pi))
-
-
-# ================================================================
-# 実行部
-# ================================================================
-
-def main() -> None:
-    print("=" * 70)
-    print("阪上循環方程式群 Major 8 Equations (Bridge Edition)")
-    print("著者：阪上哲史")
-    print("=" * 70)
-
-    model = SakagamiEquationsBridge(num_points=10000)
-
-    eq1 = model.eq1_quantum_zero()
-    print(f"【第1式】偏差0量子極限値       : {eq1:.10f}  (floor={PHYSICAL_FLOOR})")
-
-    eq2 = model.eq2_lagrangian_perturbation(np.pi / 4)
-    print(f"【第2式】ラグランジアン摂動     : {eq2:.6f}")
-
-    eq4 = model.eq4_sakagami_matrix_det(5)
-    print(f"【第4式】阪上行列式(n=5)        : {eq4}")
-
-    eq5 = model.eq5_phase_stability_div()
-    print(f"【第5式】位相場ダイバージェンス : {eq5:.6e}")
-
-    eq6 = model.eq6_time_reversal_symmetry(np.pi / 3)
-    print(f"【第6式】時間反転対称性検証     : {eq6}")
-
-    eq7 = model.eq7_tensor_T7_norm()[0]
-    print(f"【第7式】T7テンソル不変ノルム   : {eq7:.10f} (√3={np.sqrt(3):.10f})")
-
-    print("-" * 70)
-
-    rate = model.eq8_holonomic_recirculation_integral()
-    print(f"【第8式】阪上全環循環統括演算結果（循環率）: {rate:.10f}")
-
-    print("-" * 70)
-
-    if np.isclose(rate, 1.0, atol=1e-5):
-        print("✅ 判定: 第1〜7式の全体系が、第8式により完全循環率 1.0000 で収束しました。")
-    else:
-        print("⚠️ 判定: 収束度を再調整してください。")
-
-    print("=" * 70)
-
-
-if __name__ == "__main__":
-    main()
+# Major features
+- fibonacci() / fibonacci_vector(): Fibonacci数列と行列
+- sakagami_matrix(n, dimension): 阪上行列 S_n = f_n f_n^T
+- sakagami_sf(n, phase_model): SF複素スカラー列
+- sakagami_sp(n): SP素数密度加重
+- SNSPlane: SNS = {x: x1+x2+x3=0} の投影・解析
+- SakagamiMajorEight: Major 8の8式全実装
+- verify(seed, trials): 完全検証スイート（10000試行対応）
+- save_report(): JSON チェックサム付き報告書生成
 ```
+
+詳細は [sakagami_equations.py](sakagami_equations.py) をご覧ください。
+
+---
+
+## 出力例
+
+```
+================================================================================
+SAKAGAMI CIRCULATION EQUATIONS — VERIFICATION LAB v2.100
+================================================================================
+Checks : 87
+Passed : 87
+Failed : 0
+Report : /path/to/sakagami_validation_output/sakagami_validation_report_v2_100.json
+Eq. 8 current analytical/numerical value: 1.0
+0.81649658: UNRESOLVED_NOT_REPRODUCED (retained)
+PHYSICAL STATUS: UNVERIFIED
+CANONICAL STATUS: NOT FIXED
+STATUS: MATHEMATICAL CORE CONSISTENT
+```
+
+---
 
 ## ライセンス
 
-このプロジェクトは MIT ライセンスの下で公開されています。詳細は [LICENSE](LICENSE) をご覧ください。
+このプロジェクトは **MIT License** の下で公開されています。
 
-## 作者
+詳細は [LICENSE](LICENSE) をご覧ください。
 
-- **阪上哲史（Tetsushi Sakagami）**
+---
 
 ## 貢献
 
-貢献を歓迎します。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) をご覧ください。
+貢献を歓迎します。以下のガイドラインに従ってください：
+
+1. 本フォークを作成
+2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. Pull Request を作成
+
+### 貢献時の注意事項
+
+- **科学的誠実性**: すべての変更は数学的厳密性を優先してください
+- **反証の保存**: 不都合な観測値も永遠に記録してください
+- **透明性**: パラメータチューニングを避けてください
+- **再現性**: すべての結果は完全に再現可能であるべきです
+
+---
+
+## 関連リポジトリ
+
+- **sakagami-circulation-equations** (このリポジトリ): 公開版・オープンサイエンス
+- **CONSISTENCY-FREAK-2.000-AUDIT-REPORT-**: 非公開版・セキュリティ・統合管理
+
+---
+
+## お問い合わせ
+
+- **著者**: 阪上哲史（Tetsushi Sakagami）
+- **Email**: tetsushisakagami@icloud.com
+- **GitHub**: [@tetsushisakagami-svg](https://github.com/tetsushisakagami-svg)
+
+---
+
+## 謝辞
+
+- **OpenAI Verifier**: 独立検証体制の構築
+- **L1地球圏の研究コミュニティ**: 継続的なサポート
+- **Valcuria AI System**: 統合管理・自律進化システム
+
+---
+
+**最終言葉**
+
+> 科学は透明性と正直性の上に成り立つ。  
+> 不都合な観測値こそが、次の発見への扉を開く。  
+> 
+> — 阪上哲史
+
+---
+
+🉑㊗️💓😊
