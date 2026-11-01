@@ -1,0 +1,30 @@
+{
+  "name": "sakagami-circulation-equations",
+  "author": "Tetsushi Sakagami",
+  "language": "Python 3.10+",
+  "equations": 8,
+  "verification": {
+    "internal_consistency": true,
+    "eq8_measured": 1.0,
+    "analytic_checks": "verified_compute.py",
+    "known_identity_checks": "reference_check.py",
+    "physical_validity_established": false,
+    "independent_replication": false,
+    "peer_reviewed": false
+  },
+  "constants": {
+    "c_bias": "1/(6*sqrt(3))",
+    "c_bias_origin": "normalization so that eq8 = 1; geometric origin unconfirmed"
+  },
+  "history": [
+    {
+      "value": 0.81649658,
+      "status": "RESOLVED_INPUT_ERROR",
+      "note": "sqrt3 was checked as sqrt2; record kept"
+    }
+  ],
+  "entrypoints": {
+    "test": "pytest -q",
+    "run": "python sakagami_equations.py"
+  }
+}
