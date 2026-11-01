@@ -16,10 +16,16 @@ Author: Valcuria / Tetsushi Sakagami
 このスイートは、Sakagami循環方程式系の
 - 数学的整合性（Gauss, div-B, 連続性, Poisson）
 - テンソル直交性（L x G = T）
-- HPC再現性（Python ↔ C バックエンド）
+- 再現性（同一seedでの2回実行の一致、NumPy ↔ 純Python実装）
 - エネルギー保存則
 
-を、100.0/100.0のスコアで検証します。
+を検証します。
+
+[注意]
+残差はすべて実測値です（モデル問題に対するスペクトル演算子と解析解の比較、RK4のエネルギー変動、
+eq8のNumPy実装と純Python実装の差）。これは数値計算の正しさの確認であり、阪上方程式が
+物理法則であることの証明ではありません。「T·L, T·G」は成分間の平均内積による代理指標です。
+C/OpenMPバックエンドは未実装です。
 
 [使用方法]
 python3 sakagami_core_validation_suite.py [--config config.json]
@@ -181,6 +187,109 @@ class SystemReproducibility:
         }
 
 
+
+# ============================================================
+# 実測用の数値カーネル（スペクトル法 / 解析解との比較）
+# ============================================================
+
+def _wavenumbers(n: Tuple[int, int, int]):
+    """周期領域 [0, 2π)^3 の波数配列"""
+    k = [np.fft.fftfreq(m, d=1.0 / m) for m in n]
+    return np.meshgrid(*k, indexing="ij")
+
+
+def _grid(n: Tuple[int, int, int]):
+    x = [2 * np.pi * np.arange(m) / m for m in n]
+    return np.meshgrid(*x, indexing="ij")
+
+
+def _spec_grad(f, K):
+    F = np.fft.fftn(f)
+    return [np.fft.ifftn(1j * k * F).real for k in K]
+
+
+def _spec_div(v, K):
+    return sum(np.fft.ifftn(1j * k * np.fft.fftn(c)).real for k, c in zip(K, v))
+
+
+def _spec_curl(a, K):
+    F = [np.fft.fftn(c) for c in a]
+    d = lambda i, j: np.fft.ifftn(1j * K[i] * F[j]).real
+    return [d(1, 2) - d(2, 1), d(2, 0) - d(0, 2), d(0, 1) - d(1, 0)]
+
+
+def _measure_residuals(config: "ValidationConfig") -> Dict[str, float]:
+    """各残差を実際に計算する（モデル問題に対するスペクトル演算子の検証）"""
+    n = tuple(config.mesh_grid)
+    X, Y, Z = _grid(n)
+    K = _wavenumbers(n)
+    k2 = K[0] ** 2 + K[1] ** 2 + K[2] ** 2
+
+    # Gauss: φ=sin x sin y sin z, E=-∇φ, ρ=-∇²φ=3φ。 div E = ρ の残差
+    phi = np.sin(X) * np.sin(Y) * np.sin(Z)
+    E = [-g for g in _spec_grad(phi, K)]
+    gauss = float(np.max(np.abs(_spec_div(E, K) - 3.0 * phi)))
+
+    # div B: 乱数（seed固定）の帯域制限ベクトルポテンシャルから B=curl A
+    rng = np.random.default_rng(config.seed)
+    A = []
+    for _ in range(3):
+        c = rng.standard_normal(n)
+        C = np.fft.fftn(c)
+        C[k2 > 16] = 0.0
+        A.append(np.fft.ifftn(C).real)
+    B = _spec_curl(A, K)
+    div_b = float(np.max(np.abs(_spec_div(B, K))))
+
+    # 連続の式: ρ=cos(x-ct), J=cρ x̂ → ∂tρ + div J = 0
+    c0, t = 0.7, 0.3
+    rho = np.cos(X - c0 * t)
+    drho_dt = c0 * np.sin(X - c0 * t)
+    J = [c0 * rho, np.zeros(n), np.zeros(n)]
+    continuity = float(np.max(np.abs(drho_dt + _spec_div(J, K))))
+
+    # Poisson: ∇²u=ρ をFFTで解き、解析解 u=-φ' と比較 (ρ=3φ → u=-3φ/3=-φ)
+    rhs = 3.0 * phi
+    R = np.fft.fftn(rhs)
+    k2s = np.where(k2 == 0, 1.0, k2)
+    U = -R / k2s
+    U[k2 == 0] = 0.0
+    u = np.fft.ifftn(U).real
+    poisson = float(np.max(np.abs(u + phi)))
+
+    # エネルギー: 調和振動子をRK4で積分し、相対エネルギー変動を測る
+    def f(y):
+        return np.array([y[1], -y[0]])
+    y = np.array([1.0, 0.0])
+    dt, steps = 0.01, 1000
+    e0 = 0.5 * (y @ y)
+    for _ in range(steps):
+        k1 = f(y)
+        k2_ = f(y + 0.5 * dt * k1)
+        k3 = f(y + 0.5 * dt * k2_)
+        k4 = f(y + dt * k3)
+        y = y + dt / 6 * (k1 + 2 * k2_ + 2 * k3 + k4)
+    energy = float(abs(0.5 * (y @ y) - e0) / e0)
+
+    return {"gauss": gauss, "div_b": div_b, "continuity": continuity,
+            "poisson": poisson, "energy": energy}
+
+
+def _eq8_pure_python(num_points: int = 10000) -> float:
+    """eq8 を NumPy を使わず（math.fsum で）再計算する独立実装"""
+    import math
+    phi = (1 + math.sqrt(5)) / 2
+    c_bias = 1.0 / (6.0 * math.sqrt(3))
+    h = 2 * math.pi / (num_points - 1)
+    vals = []
+    for i in range(num_points):
+        th = i * h
+        e_sum = sum(c_bias + math.sin(k * th) / phi ** k for k in range(1, 7))
+        vals.append(e_sum * math.sqrt(math.cos(th) ** 2 + math.sin(th) ** 2 + 2.0))
+    integral = math.fsum((vals[i] + vals[i + 1]) * h / 2 for i in range(num_points - 1))
+    return abs(integral) / (2 * math.pi)
+
+
 # ============================================================
 # メイン検証エンジン
 # ============================================================
@@ -202,12 +311,10 @@ class SakagamiCoreValidator:
         """残差の検証を実行"""
         logger.info("Validating physical & mathematical residuals...")
         
-        # シミュレーション（プロトタイプ値）
-        gauss_res = 2.31e-12
-        div_b_res = 4.72e-14
-        continuity_res = 8.11e-10
-        poisson_res = 1.02e-11
-        energy_drift = 3.42e-08
+        m = _measure_residuals(self.config)
+        gauss_res, div_b_res = m["gauss"], m["div_b"]
+        continuity_res, poisson_res = m["continuity"], m["poisson"]
+        energy_drift = m["energy"]
         
         self.residuals = ResidualMetrics(
             gauss_residual=gauss_res,
@@ -235,11 +342,14 @@ class SakagamiCoreValidator:
         """テンソル整合性の検証を実行"""
         logger.info("Validating Sakagami Circulation & Tensor Consistency...")
         
-        # シミュレーション（プロトタイプ値）
-        circulation = 1.0000000000
-        t_dot_l = 1.12e-16
-        t_dot_g = 0.00e+00
-        t7_norm = np.sqrt(3)
+        from sakagami_equations import SakagamiEquationsBridge, _trapezoid
+        model = SakagamiEquationsBridge(num_points=10000)
+        circulation = model.eq8_holonomic_recirculation_integral()
+        th = model.theta
+        # 直交性は成分間の平均内積（cosθ·sinθ, cosθ·1）で測る
+        t_dot_l = abs(float(_trapezoid(np.cos(th) * np.sin(th), th))) / (2 * np.pi)
+        t_dot_g = abs(float(_trapezoid(np.cos(th), th))) / (2 * np.pi)
+        t7_norm = float(np.mean(model.eq7_tensor_T7_norm()))
         
         self.tensor_consistency = TensorConsistency(
             circulation_rate=circulation,
@@ -252,7 +362,7 @@ class SakagamiCoreValidator:
         
         logger.info(f"  Circulation Rate (Eq8): {circulation:.10f} [{status_dict['circulation_rate']}]")
         logger.info(f"  T·L Orthogonality: {t_dot_l:.2e} | T·G: {t_dot_g:.2e} [{status_dict['orthogonality_l']}]")
-        logger.info(f"  T7 Norm Verification: sqrt(3) constant [{status_dict['norm_verification']}]")
+        logger.info(f"  T7 Norm Verification: {t7_norm:.10f} vs sqrt(3) [{status_dict['norm_verification']}]")
         
         if not self.tensor_consistency.all_pass():
             raise ConsistencyError("Tensor consistency validation failed")
@@ -264,10 +374,12 @@ class SakagamiCoreValidator:
         """システム再現性の検証を実行"""
         logger.info("Validating System & Reproducibility Checks...")
         
-        # シミュレーション（プロトタイプ値）
-        operator_pass = True
-        reproducibility_pass = True
-        backend_diff = 4.12e-15
+        r1 = _measure_residuals(self.config)
+        r2 = _measure_residuals(self.config)
+        reproducibility_pass = r1 == r2
+        operator_pass = bool(self.residuals is not None and self.residuals.div_b_residual <= self.config.div_b_tolerance)
+        from sakagami_equations import SakagamiEquationsBridge
+        backend_diff = abs(_eq8_pure_python(10000) - SakagamiEquationsBridge(10000).eq8_holonomic_recirculation_integral())
         
         self.system_reproducibility = SystemReproducibility(
             operator_consistency_pass=operator_pass,
@@ -277,9 +389,9 @@ class SakagamiCoreValidator:
         
         status_dict = self.system_reproducibility.get_status_dict()
         
-        logger.info(f"  Operator Consistency: grad/div {status_dict['operator_consistency']} | curl/div PASS | Projection PASS")
+        logger.info(f"  Operator Consistency: div(curl A) {status_dict['operator_consistency']}")
         logger.info(f"  Reproducibility: Seed={self.config.seed} Deterministic Verification [{status_dict['reproducibility']}]")
-        logger.info(f"  Backend Agreement: Python ↔ C Match (Diff: {backend_diff:.2e}) [{status_dict['backend_agreement']}]")
+        logger.info(f"  Backend Agreement: NumPy ↔ pure-Python (C backend not implemented) (Diff: {backend_diff:.2e}) [{status_dict['backend_agreement']}]")
         
         if not self.system_reproducibility.all_pass():
             raise ConsistencyError("System reproducibility validation failed")
@@ -383,9 +495,9 @@ class SakagamiCoreValidator:
         print("=" * 80)
         
         print(f"\n[Execution Context]")
-        print(f"  Backend Mode        : Python (NumPy) + C-Bridge (Sakagami_core.so)")
+        print(f"  Backend Mode        : Python (NumPy) only (no C backend)")
         print(f"  Mesh Grid           : {report['configuration']['mesh_grid'][0]} x {report['configuration']['mesh_grid'][1]} x {report['configuration']['mesh_grid'][2]} (3D Periodic Domain)")
-        print(f"  HPC Acceleration    : {report['configuration']['hpc_backend'].upper()} / C-SIMD Enabled")
+        print(f"  HPC Acceleration    : {report['configuration']['hpc_backend']} (config value only; no C/OpenMP backend is implemented)")
         
         print(f"\n[1. Physical & Mathematical Residuals]")
         res = report['physical_mathematical_residuals']
@@ -397,15 +509,15 @@ class SakagamiCoreValidator:
         
         print(f"\n[2. Sakagami Circulation & Tensor Consistency]")
         tensor = report['sakagami_circulation_tensor_consistency']
-        print(f"  Circulation Rate (Eq8): {tensor['circulation_rate']}  [{tensor['status']['circulation_rate']} - Perfect Convergence]")
+        print(f"  Circulation Rate (Eq8): {tensor['circulation_rate']}  [{tensor['status']['circulation_rate']}]")
         print(f"  T = L x G Orthogonality: T·L = {tensor['t_dot_l']} | T·G = {tensor['t_dot_g']}  [{tensor['status']['orthogonality_l']}]")
-        print(f"  T7 Norm Verification : sqrt(3) Constant  [{tensor['status']['norm_verification']}]")
+        print(f"  T7 Norm Verification : {tensor['t7_norm']} vs sqrt(3)  [{tensor['status']['norm_verification']}]")
         
         print(f"\n[3. System & Reproducibility Checks]")
         sys_check = report['system_reproducibility_checks']
-        print(f"  Operator Consistency : grad/div {sys_check['status']['operator_consistency']} | curl/div PASS | Projection PASS")
+        print(f"  Operator Consistency : div(curl A) {sys_check['status']['operator_consistency']}")
         print(f"  Reproducibility      : Seed={report['configuration']['seed']} Deterministic Verification [{sys_check['status']['reproducibility']}]")
-        print(f"  Backend Agreement    : Python ↔ C Match (Diff: {sys_check['backend_diff']}) [{sys_check['status']['backend_agreement']}]")
+        print(f"  Backend Agreement    : NumPy ↔ pure-Python (Diff: {sys_check['backend_diff']}) [{sys_check['status']['backend_agreement']}]")
         
         print(f"\n" + "-" * 80)
         print(f"🎯 OVERALL CONSISTENCY SCORE : {report['overall_score']} / 100.0  [{report['overall_status']} / {report['friction_coefficient']:.3f}% Friction]")
