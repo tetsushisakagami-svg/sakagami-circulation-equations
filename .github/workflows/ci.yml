@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 jobs:
   test:
@@ -38,6 +37,8 @@ jobs:
     needs: test
     if: ${{ failure() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Open or update a CI failure issue
         env:
