@@ -495,7 +495,7 @@ class SakagamiCoreValidator:
         print("=" * 80)
         
         print(f"\n[Execution Context]")
-        print(f"  Backend Mode        : Python (NumPy) + C-Bridge (Sakagami_core.so)")
+        print(f"  Backend Mode        : Python (NumPy) only (no C backend)")
         print(f"  Mesh Grid           : {report['configuration']['mesh_grid'][0]} x {report['configuration']['mesh_grid'][1]} x {report['configuration']['mesh_grid'][2]} (3D Periodic Domain)")
         print(f"  HPC Acceleration    : {report['configuration']['hpc_backend']} (config value only; no C/OpenMP backend is implemented)")
         
