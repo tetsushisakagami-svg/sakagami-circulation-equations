@@ -37,6 +37,8 @@
 
 import numpy as np
 
+_trapezoid = getattr(np, "trapezoid", None) or np.trapz  # NumPy 2.x removed trapz
+
 
 # ================================================================
 # 定数定義
@@ -201,7 +203,7 @@ class SakagamiEquationsBridge:
         T7_norm = self.eq7_tensor_T7_norm()
 
         integrand = E_sum * T7_norm
-        raw_integral = np.trapz(integrand, self.theta)
+        raw_integral = _trapezoid(integrand, self.theta)
 
         return float(abs(raw_integral) / (2 * np.pi))
 
