@@ -176,11 +176,11 @@ def generate_status_report():
             "code_review_support": "Dialogue-based AI support available",
             "falsification_memory": "PERMANENTLY RETAINED",
             "parameter_tuning": "NEVER APPLIED",
-            "unresolved_observations": [
+            "past_observations": [
                 {
                     "id": "EQ8-OBSERVED-081649658",
                     "value": 0.81649658,
-                    "status": "UNRESOLVED_NOT_REPRODUCED",
+                    "status": "RESOLVED_INPUT_ERROR",
                     "retention": "ETERNAL"
                 }
             ]
