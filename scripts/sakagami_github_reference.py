@@ -132,7 +132,7 @@ class RepositoryVerification:
             current_verification=(
                 "Mathematical consistency verified. "
                 "Physical interpretation pending. "
-                "Unresolved observation (0.81649658) permanently recorded."
+                "Past observation (0.81649658) resolved as an input error (sqrt3 checked as sqrt2); record retained."
             ),
             
             license_type="MIT License",
@@ -175,17 +175,17 @@ class RepositoryVerification:
                 }
             ),
             VerificationCheckpoint(
-                checkpoint_id="UNRESOLVED_OBSERVATIONS",
-                description="Permanently Recorded Unresolved Values",
+                checkpoint_id="PAST_OBSERVATIONS",
+                description="Permanently Recorded Past Observations (Resolved)",
                 status="RECORDED",
                 timestamp="2026-09-01T00:00:00Z",
                 details={
                     "observation_id": "EQ8-OBSERVED-081649658",
                     "observed_value": 0.81649658,
                     "current_value": 1.0,
-                    "resolution_status": "UNRESOLVED_NOT_REPRODUCED",
+                    "resolution_status": "RESOLVED_INPUT_ERROR",
                     "parametrization": "None (no parameter tuning applied)",
-                    "note": "Permanently recorded for future researchers",
+                    "note": "Cause: input error (sqrt(3) verified as sqrt(2)); eq8 measured as 1.0 after correction. Record retained for transparency.",
                 }
             ),
         ]
@@ -284,7 +284,7 @@ def print_transparency_statement() -> None:
     print("\n  This project maintains maximum scientific transparency:")
     print("    ✓ All source code is publicly available")
     print("    ✓ All test results are recorded (including failures)")
-    print("    ✓ Unresolved observations are permanently archived")
+    print("    ✓ Past observations (incl. resolved ones) are permanently archived")
     print("    ✓ No parameter tuning is applied to achieve results")
     print("    ✓ Complete reproducibility is ensured")
     

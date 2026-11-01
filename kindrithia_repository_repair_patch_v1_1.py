@@ -209,15 +209,15 @@ def run(root: Path, apply: bool, report_path: Path) -> int:
         if updated != original:
             planned[path] = updated.encode("utf-8")
 
-    # Never erase the unresolved observation; require explicit falsification memory.
+    # Never erase the past observation record; require explicit falsification memory.
     combined = "\n".join(
         p.read_text(encoding="utf-8", errors="replace")
         for p in root.rglob("*") if p.is_file() and p.suffix in {".py", ".md", ".json"}
         and ".kindrithia_repair_backup" not in p.parts
     )
-    if "0.81649658" in combined and "UNRESOLVED_NOT_REPRODUCED" not in combined:
+    if "0.81649658" in combined and "RESOLVED_INPUT_ERROR" not in combined:
         findings.append(Finding("ERROR", "FALSIFICATION_MEMORY_INCOMPLETE", ".",
-                                "0.81649658をUNRESOLVED_NOT_REPRODUCEDとして保持してください。"))
+                                "0.81649658をRESOLVED_INPUT_ERROR（入力ミスで解決済み）として記録を保持してください。"))
 
     generated_status = validate_generated(root, findings)
     backup_dir: Path | None = None
