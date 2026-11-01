@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Unit tests
+        run: pytest -q
+      - name: Run main scripts
+        run: |
+          python sakagami_equations.py
+          python verified_compute.py
+          python sakagami_core_validation_suite.py
+
+  report-failure:
+    needs: test
+    if: ${{ failure() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update a CI failure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          existing=$(gh issue list -R "$GITHUB_REPOSITORY" --label ci-failure --state open --json number -q '.[0].number')
+          body="CI failed on ${GITHUB_REF_NAME} (${GITHUB_SHA}). Run: ${RUN_URL}"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" -R "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh label create ci-failure -R "$GITHUB_REPOSITORY" --color D93F0B 2>/dev/null || true
+            gh issue create -R "$GITHUB_REPOSITORY" --label ci-failure --title "CI failure" --body "$body"
+          fi

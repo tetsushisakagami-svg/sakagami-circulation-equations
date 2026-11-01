@@ -1,0 +1,21 @@
+# sakagami-circulation-equations
+
+> 阪上循環方程式群（Sakagami Circulation Equations）。Python による公開研究コード。
+> A public research project implementing 8 related equations in Python with numerical checks.
+
+## Status (read this first)
+- Verified: the code is internally consistent (eq8 evaluates to 1.0000 numerically; checked against analytic values).
+- NOT verified: physical meaning, independent replication, peer review. Do not present this as established physics.
+- Constant `c_bias = 1/(6*sqrt(3))` is a normalization chosen so that eq8 = 1; its geometric origin is unconfirmed.
+- Past record 0.81649658 = sqrt(2/3) was an input error (sqrt3 checked as sqrt2); kept as history, status RESOLVED_INPUT_ERROR.
+
+## Key files
+- [README.md](README.md): overview and limitations
+- [sakagami_equations.py](sakagami_equations.py): the 8 equations (`SakagamiEquationsBridge`)
+- [verified_compute.py](verified_compute.py): checks against analytic values, convergence test
+- [reference_check.py](reference_check.py): checks against known identities (Cassini, golden ratio, trig); log in logs/reference_check.jsonl
+- [machine_readable.json](machine_readable.json): structured summary
+- [AGENTS.md](AGENTS.md): instructions for AI agents
+
+## Run
+pip install -r requirements.txt && pytest -q
